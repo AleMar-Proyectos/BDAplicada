@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Ingresar · MarketCar Panel</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/login.css">
+  <script type="module" src="/js/login.js"></script>
+</head>
+<body>
+  <main class="login">
+    <!-- Panel de marca -->
+    <section class="login__marca" aria-hidden="true">
+      <div class="marca">
+        <img src="/img/logo.svg" alt="" width="40" height="40">
+        <span>MarketCar</span>
+      </div>
+
+      <div class="login__mensaje">
+        <p class="login__etiqueta">Panel de control</p>
+        <h1 class="login__titulo">Dónde se vende, quién convierte y qué está quieto.</h1>
+        <p class="login__bajada">
+          Indicadores del marketplace por provincia, ciudad, vendedor y publicación.
+        </p>
+      </div>
+
+      <div class="login__ruta"></div>
+    </section>
+
+    <!-- Formulario -->
+    <section class="login__formulario">
+      <form id="form-login" class="tarjeta" novalidate>
+        <div class="marca marca--movil">
+          <img src="/img/logo.svg" alt="" width="32" height="32">
+          <span>MarketCar</span>
+        </div>
+
+        <header class="tarjeta__encabezado">
+          <h2>Iniciar sesión</h2>
+          <p>Acceso exclusivo para administradores del marketplace.</p>
+        </header>
+
+        <div id="aviso" class="aviso aviso--error" role="alert" aria-live="assertive" hidden>
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5v4.2M8 11.2v.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <span id="aviso-texto"></span>
+        </div>
+
+        <div class="campo">
+          <label for="usuario">Usuario o correo</label>
+          <input id="usuario" name="usuario" type="text" autocomplete="username"
+                 autocapitalize="none" spellcheck="false" maxlength="120" required
+                 aria-describedby="usuario-error">
+          <p id="usuario-error" class="campo__error" hidden></p>
+        </div>
+
+        <div class="campo">
+          <label for="password">Contraseña</label>
+          <div class="campo__password">
+            <input id="password" name="password" type="password" autocomplete="current-password"
+                   maxlength="128" required aria-describedby="password-error mayus">
+            <button type="button" id="ver-password" class="campo__ojo"
+                    aria-label="Mostrar contraseña" aria-pressed="false">
+              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path class="tachado" d="M4 4l16 16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <p id="mayus" class="campo__ayuda" hidden>Bloq Mayús está activado.</p>
+          <p id="password-error" class="campo__error" hidden></p>
+        </div>
+
+        <button id="btn-ingresar" type="submit" class="boton boton--primario boton--ancho">
+          <span class="spinner" hidden></span>
+          <span class="boton__texto">Ingresar</span>
+        </button>
+
+        <p class="tarjeta__pie">
+          Las credenciales se verifican con Supabase Auth.
+          La contraseña se guarda cifrada con bcrypt.
+        </p>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

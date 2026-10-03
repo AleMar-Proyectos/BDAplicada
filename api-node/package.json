@@ -1,0 +1,24 @@
+{
+  "name": "marketcar-panel-api",
+  "version": "1.0.0",
+  "description": "MarketCar · Panel de control — gateway de autenticación (Supabase Auth) y servidor del front",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@supabase/auth-js": "^2.117.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.5",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^8.0.0",
+    "pg": "^8.13.0",
+    "zod": "^3.23.8"
+  }
+}

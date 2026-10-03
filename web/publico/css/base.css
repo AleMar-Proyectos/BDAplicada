@@ -1,0 +1,213 @@
+/* =============================================================================
+   MarketCar · Panel de control — tokens y estilos base
+   ========================================================================== */
+
+:root {
+  --marca: #cf4c24;
+  --marca-fuerte: #b23d18;
+  --marca-suave: #fbe9e2;
+
+  --fondo: #f6f4f1;
+  --superficie: #ffffff;
+  --superficie-2: #f0ece7;
+  --borde: #ddd6ce;
+  --texto: #1d1916;
+  --texto-2: #5f5750;
+  --texto-3: #8b8178;
+
+  --ok: #1f7a4d;
+  --ok-suave: #e3f3ea;
+  --alerta: #9a6b00;
+  --alerta-suave: #fdf3d8;
+  --error: #b42318;
+  --error-suave: #fde8e6;
+
+  --foco: 0 0 0 3px color-mix(in srgb, var(--marca) 35%, transparent);
+  --radio: 10px;
+  --radio-sm: 6px;
+  --sombra: 0 1px 2px rgb(29 25 22 / 6%), 0 8px 24px rgb(29 25 22 / 8%);
+
+  --fuente: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --marca: #e8663d;
+    --marca-fuerte: #f07a52;
+    --marca-suave: #3a2219;
+
+    --fondo: #131110;
+    --superficie: #1c1917;
+    --superficie-2: #252120;
+    --borde: #3a3431;
+    --texto: #f3eeea;
+    --texto-2: #bcb2aa;
+    --texto-3: #8d837c;
+
+    --ok: #5cc795;
+    --ok-suave: #15291f;
+    --alerta: #e5b84a;
+    --alerta-suave: #2e2512;
+    --error: #f2877c;
+    --error-suave: #34191a;
+
+    --sombra: 0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 35%);
+    color-scheme: dark;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--fuente);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- Botones ------------------------------------------------------------- */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: var(--radio-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, transform 0.05s;
+}
+
+.boton:focus-visible {
+  outline: none;
+  box-shadow: var(--foco);
+}
+
+.boton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.boton:disabled {
+  cursor: progress;
+  opacity: 0.75;
+}
+
+.boton--primario {
+  background: var(--marca);
+  color: #fff;
+}
+
+.boton--primario:hover:not(:disabled) {
+  background: var(--marca-fuerte);
+}
+
+.boton--secundario {
+  background: var(--superficie);
+  border-color: var(--borde);
+  color: var(--texto);
+}
+
+.boton--secundario:hover:not(:disabled) {
+  background: var(--superficie-2);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgb(255 255 255 / 40%);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: girar 0.7s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- Avisos -------------------------------------------------------------- */
+.aviso {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-radius: var(--radio-sm);
+  border: 1px solid;
+  font-size: 14px;
+}
+
+.aviso[hidden] {
+  display: none;
+}
+
+.aviso svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.aviso--error {
+  background: var(--error-suave);
+  border-color: color-mix(in srgb, var(--error) 35%, transparent);
+  color: var(--error);
+}
+
+.aviso--info {
+  background: var(--alerta-suave);
+  border-color: color-mix(in srgb, var(--alerta) 35%, transparent);
+  color: var(--alerta);
+}
+
+.aviso--ok {
+  background: var(--ok-suave);
+  border-color: color-mix(in srgb, var(--ok) 35%, transparent);
+  color: var(--ok);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

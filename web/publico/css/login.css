@@ -1,0 +1,240 @@
+/* =============================================================================
+   Pantalla de inicio de sesión
+   ========================================================================== */
+
+.login {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+/* ---- Panel de marca ------------------------------------------------------ */
+.login__marca {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 48px clamp(32px, 5vw, 72px);
+  background: #191512;
+  color: #f3eeea;
+  overflow: hidden;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.login__mensaje {
+  position: relative;
+  z-index: 1;
+  max-width: 30rem;
+  margin-bottom: 18vh;
+}
+
+.login__etiqueta {
+  margin-bottom: 14px;
+  color: #ef8a63;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.login__titulo {
+  font-size: clamp(28px, 3.2vw, 42px);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.login__bajada {
+  margin-top: 16px;
+  color: #b9aea6;
+  font-size: 16px;
+}
+
+/* Ruta en perspectiva: líneas de carril que avanzan */
+.login__ruta {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 38%;
+  background:
+    linear-gradient(to top, #191512 0%, transparent 60%),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgb(207 76 36 / 22%) 46px 48px);
+  transform: perspective(380px) rotateX(58deg);
+  transform-origin: bottom;
+  mask-image: linear-gradient(to top, #000 10%, transparent 95%);
+}
+
+.login__ruta::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 6px;
+  height: 200%;
+  margin-left: -3px;
+  background: repeating-linear-gradient(to top, #cf4c24 0 34px, transparent 34px 70px);
+  animation: avanzar 1.6s linear infinite;
+}
+
+@keyframes avanzar {
+  to {
+    transform: translateY(70px);
+  }
+}
+
+/* ---- Formulario ---------------------------------------------------------- */
+.login__formulario {
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.marca--movil {
+  display: none;
+  color: var(--texto);
+  font-size: 18px;
+}
+
+.tarjeta__encabezado h2 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.tarjeta__encabezado p {
+  margin-top: 4px;
+  color: var(--texto-2);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.campo input {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-sm);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.campo input:hover {
+  border-color: var(--texto-3);
+}
+
+.campo input:focus {
+  outline: none;
+  border-color: var(--marca);
+  box-shadow: var(--foco);
+}
+
+.campo input[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+.campo__password {
+  position: relative;
+}
+
+.campo__password input {
+  padding-right: 48px;
+}
+
+.campo__ojo {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 38px;
+  transform: translateY(-50%);
+  background: none;
+  border: 0;
+  border-radius: var(--radio-sm);
+  color: var(--texto-3);
+  cursor: pointer;
+}
+
+.campo__ojo:hover {
+  color: var(--texto);
+}
+
+.campo__ojo:focus-visible {
+  outline: none;
+  box-shadow: var(--foco);
+}
+
+.campo__ojo[aria-pressed="true"] .tachado {
+  display: none;
+}
+
+.campo__error,
+.campo__ayuda {
+  font-size: 13px;
+}
+
+.campo__error {
+  color: var(--error);
+}
+
+.campo__ayuda {
+  color: var(--alerta);
+}
+
+.campo__error[hidden],
+.campo__ayuda[hidden],
+.spinner[hidden] {
+  display: none;
+}
+
+.boton--ancho {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.tarjeta__pie {
+  color: var(--texto-3);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ---- Responsive ---------------------------------------------------------- */
+@media (max-width: 860px) {
+  .login {
+    grid-template-columns: 1fr;
+  }
+
+  .login__marca {
+    display: none;
+  }
+
+  .marca--movil {
+    display: flex;
+  }
+}

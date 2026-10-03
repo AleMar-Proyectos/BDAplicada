@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Tablero · MarketCar Panel</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/tablero.css">
+  <script type="module" src="/js/tablero.js"></script>
+</head>
+<body>
+  <header class="barra">
+    <div class="barra__marca">
+      <img src="/img/logo.svg" alt="" width="30" height="30">
+      <span>MarketCar <small>Panel de control</small></span>
+    </div>
+
+    <div class="barra__usuario">
+      <div class="avatar" id="avatar" aria-hidden="true">–</div>
+      <div class="barra__datos">
+        <strong id="nombre-usuario">Cargando…</strong>
+        <span id="correo-usuario"></span>
+      </div>
+      <button id="btn-salir" type="button" class="boton boton--secundario">
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Cerrar sesión
+      </button>
+    </div>
+  </header>
+
+  <main class="contenido">
+    <section class="saludo">
+      <h1 id="saludo">Bienvenido</h1>
+      <p>Sesión iniciada como administrador del marketplace.</p>
+    </section>
+
+    <section class="verificaciones" aria-label="Verificación de la sesión">
+      <article class="panel">
+        <header class="panel__titulo">
+          <span class="chip">Node.js</span>
+          <h2>Sesión · Supabase Auth</h2>
+        </header>
+        <dl class="datos">
+          <div><dt>Usuario</dt><dd id="d-usuario">—</dd></div>
+          <div><dt>Rol</dt><dd id="d-rol">—</dd></div>
+          <div><dt>Tipo de cuenta</dt><dd id="d-tipo">—</dd></div>
+          <div><dt>Último acceso</dt><dd id="d-acceso">—</dd></div>
+        </dl>
+        <p class="estado estado--ok">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Token verificado y perfil leído de <code>public.perfiles</code>
+        </p>
+      </article>
+
+      <article class="panel">
+        <header class="panel__titulo">
+          <span class="chip chip--net">.NET</span>
+          <h2>API · validación del JWT</h2>
+        </header>
+        <dl class="datos">
+          <div><dt>Endpoint</dt><dd><code>GET /api/perfil</code></dd></div>
+          <div><dt>Política</dt><dd>Administrador</dd></div>
+          <div><dt>Token expira</dt><dd id="d-expira">—</dd></div>
+          <div><dt>Alta de la cuenta</dt><dd id="d-alta">—</dd></div>
+        </dl>
+        <p id="estado-net" class="estado estado--pendiente">Consultando la API .NET…</p>
+      </article>
+    </section>
+
+    <section class="tablero-vacio" aria-labelledby="titulo-tablero">
+      <h2 id="titulo-tablero">Indicadores del marketplace</h2>
+      <p>
+        Acá se monta el tablero: indicadores de cabecera, drill down
+        Provincia → Ciudad → Vendedor → Publicación y semaforización.
+      </p>
+    </section>
+  </main>
+</body>
+</html>
