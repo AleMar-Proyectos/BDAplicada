@@ -1,4 +1,4 @@
-import { ErrorApp } from '../errores.js';
+import { ErrorApp } from '../libs/errores.js';
 
 export function noEncontrado(req, res) {
   res.status(404).json({ ok: false, codigo: 'NO_ENCONTRADO', mensaje: 'Recurso no encontrado.' });

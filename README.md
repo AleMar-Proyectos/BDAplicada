@@ -42,7 +42,7 @@ Es el mismo esquema que usaría el marketplace (.NET) y el panel (Node) con un �
 ```mermaid
 sequenceDiagram
     actor A as Administrador
-    participant F as Front (login.html)
+    participant F as Front (client/index.html)
     participant N as Node.js
     participant DB as Supabase PostgreSQL
     participant SA as Supabase Auth
@@ -77,11 +77,11 @@ sequenceDiagram
 
 | Requisito | Implementación |
 |---|---|
-| Pantalla de login que controla el acceso | `web/publico/login.html`. El tablero (`web/privado/tablero.html`) **no es público**: Node solo lo envía si la sesión es válida (`GET /tablero`). |
+| Pantalla de login que controla el acceso | `client/index.html` (se sirve en `/`). El tablero (`client/src/pages/tablero.html`) **no es público**: Node solo lo envía si la sesión es válida (`GET /tablero`). |
 | Credenciales verificadas contra una tabla de usuarios en la BD | `auth.users` (credenciales) + `public.perfiles` (perfil y rol), ambas en la base de Supabase. |
 | Usuario y contraseña deben corresponder a un usuario registrado | Supabase Auth compara la contraseña; Node además exige que exista el perfil en `public.perfiles`. |
 | Contraseña almacenada con un mecanismo de protección | **bcrypt** con sal aleatoria y costo 10 (`crypt(password, gen_salt('bf', 10))`). Nunca texto plano; el script final lo verifica mostrando el prefijo `$2a$10$`. |
-| Redirección automática al tablero | El login responde `redirigirA: "/tablero"` y el front hace `location.replace`. Si ya hay sesión, `login.html` redirige solo. |
+| Redirección automática al tablero | El login responde `redirigirA: "/tablero"` y el front hace `location.replace`. Si ya hay sesión, el login redirige solo. |
 | Credenciales incorrectas impiden el acceso | 401 con mensaje genérico; `/tablero` sin sesión redirige al login (303) y la API devuelve 401. |
 | No requiere historial de sesiones | No se guarda historial; solo `ultimo_acceso` (un campo) para mostrarlo en el tablero. |
 
@@ -96,37 +96,61 @@ sequenceDiagram
 - **Validación de entrada** con `zod`, body máximo 10 KB, consultas SQL **parametrizadas**.
 - **Cabeceras de seguridad** con `helmet` (incluye Content-Security-Policy: el front no usa scripts inline).
 - **RLS** en `public.perfiles`: con la *anon key* nadie puede listar usuarios; cada usuario ve su fila y el admin ve todas.
-- **Secretos fuera del código**: `.env` (Node) y `dotnet user-secrets` (.NET), ambos en `.gitignore`.
+- **Secretos fuera del código**: `.env` en la raíz (Node; modelo en `.env.local`) y `dotnet user-secrets` (.NET), ambos en `.gitignore`.
 - **.NET sin CORS**: solo lo llama el servidor Node.
 
 ## 5. Estructura
 
+Organizada igual que el proyecto de referencia de la cátedra: back en `src/`, front en `client/`
+y scripts SQL en `db/`. La API .NET queda aparte en `api-dotnet/`.
+
 ```
-BDAplicada_Proyecto/
-├── database/
-│   └── 01_auth_usuarios.sql        Tabla usuario, rol, bcrypt, trigger → JWT, RLS y usuarios iniciales
-├── api-node/                       Node.js · Express
-│   ├── .env.example
-│   └── src/
-│       ├── server.js               Arranque y cierre ordenado
-│       ├── app.js                  Middlewares, rutas y páginas
-│       ├── config.js               Variables de entorno validadas (fail fast)
-│       ├── db.js                   Pool de PostgreSQL
+BDAplicada/
+├── package.json                    Dependencias y scripts del back (npm run dev / npm start)
+├── .env.local                      MODELO de variables de entorno → copiar como .env
+├── src/                            BACK · Node.js + Express
+│   ├── index.js                    Arranque del servidor y cierre ordenado
+│   ├── app.js                      Middlewares, rutas de la API y páginas del front
+│   ├── config.js                   Variables de entorno validadas (fail fast)
+│   ├── db.js                       Pool de PostgreSQL (Supabase)
+│   ├── routes/                     Solo conectan URL → middleware → controlador
+│   │   ├── auth.routes.js          /api/auth/login · logout · sesion
+│   │   ├── tablero.routes.js       /api/tablero
+│   │   └── net.routes.js           /api/net/*  (puente a .NET)
+│   ├── controllers/                Lógica de cada endpoint
+│   │   ├── auth.controller.js      Login con Supabase Auth, logout y sesión
+│   │   ├── tablero.controller.js   Drill down: ejecuta db/07_consultas_tablero.sql
+│   │   └── net.controller.js       Reenvía a la API .NET con el JWT
+│   ├── middleware/
+│   │   ├── validateToken.js        Verifica la sesión (API → 401/403, página → login)
+│   │   └── errores.js              404, manejador de errores y log de requests
+│   └── libs/
 │       ├── supabase.js             Cliente de Supabase Auth (uno por operación)
-│       ├── errores.js              Errores de negocio con código estable
-│       ├── repositorios/usuario.repositorio.js
-│       ├── servicios/auth.servicio.js     Lógica de login / verificación / logout
-│       ├── middlewares/            cookies, requiereSesion, errores y log
-│       └── rutas/                  /api/auth/*  y  /api/net/* (puente a .NET)
-├── api-dotnet/MarketCar.Api/       .NET 8 · ASP.NET Core
-│   ├── Program.cs
-│   ├── Autenticacion/              Validación del JWT de Supabase (JWKS o HS256) y política Administrador
-│   ├── Datos/UsuarioRepositorio.cs Npgsql (ADO.NET)
-│   ├── Controllers/                PerfilController (protegido) y SaludController
-│   └── Modelos/PerfilDto.cs
-└── web/
-    ├── publico/                    login.html, css/, js/, img/  (archivos estáticos)
-    └── privado/tablero.html        Solo se entrega con sesión válida
+│       ├── cookies.js              Cookies httpOnly de sesión
+│       ├── usuarios.js             Consultas a public.perfiles y control de rol
+│       └── errores.js              Errores de negocio con código estable
+├── client/                         FRONT · HTML + CSS + JavaScript
+│   ├── index.html                  Pantalla de login (se sirve en /)
+│   ├── public/img/logo.svg
+│   └── src/
+│       ├── api/api.js              Cliente HTTP (fetch) hacia el back
+│       ├── pages/
+│       │   ├── login.js
+│       │   ├── tablero.html        Solo se entrega con sesión válida (GET /tablero)
+│       │   └── tablero.js          Indicadores, drill down/up, semáforo y gráficos
+│       └── stylesheets/
+│           ├── base.css
+│           ├── loginPage/login.css
+│           └── tableroPage/tablero.css
+├── db/                             Scripts SQL (Supabase → SQL Editor, en orden)
+│   ├── 02_unificar_vehiculos.sql … 06_datos_ejemplo.sql
+│   └── 07_consultas_tablero.sql    Consultas del tablero (las lee el back)
+└── api-dotnet/MarketCar.Api/       API .NET 8 · ASP.NET Core
+    ├── Program.cs
+    ├── Autenticacion/              Validación del JWT de Supabase (JWKS o HS256) y política Administrador
+    ├── Datos/UsuarioRepositorio.cs Npgsql (ADO.NET)
+    ├── Controllers/                PerfilController (protegido) y SaludController
+    └── Modelos/PerfilDto.cs
 ```
 
 ### Endpoints
@@ -163,15 +187,16 @@ Supabase → **SQL Editor**, en este orden:
 | `06_datos_ejemplo.sql` | Datos de ejemplo con `INSERT`: 4 provincias, 12 ciudades, 22 vendedores, ~170 publicaciones y sus ventas |
 | `07_consultas_tablero.sql` | Las consultas del tablero. **No se ejecuta a mano**: Node lee este archivo y corre cada bloque por su nombre |
 
-### 6.2 Node.js
+### 6.2 Node.js (back + front)
+Desde la **carpeta raíz** del proyecto (donde está `package.json`):
 ```bash
-cd api-node                  # npm install trae también Chart.js, que Node sirve en /vendor/chartjs
-cp .env.example .env        # en Windows: copy .env.example .env
+npm install                  # instala también Chart.js, que el back sirve en /vendor/chartjs
+cp .env.local .env           # en Windows: copy .env.local .env
 # completar SUPABASE_URL, SUPABASE_ANON_KEY (Project Settings → API)
 # y DATABASE_URL (Connect → Session pooler)
-npm install
-npm start                    # http://localhost:3000
+npm run dev                  # o npm start → http://localhost:3000
 ```
+El mismo servidor Node entrega el front de `client/`, así que no hace falta levantarlo aparte.
 
 ### 6.3 .NET
 ```bash
@@ -194,7 +219,7 @@ Abrir **http://localhost:3000**.
 | Contraseña incorrecta | `admin` | cualquier otra | "Usuario o contraseña incorrectos." |
 | Usuario inexistente | `noexiste` | cualquiera | Mismo mensaje genérico |
 | Cuenta sin permiso | `capital.motors` | `Vendedor123!` | "Tu cuenta no tiene permiso…" (403) |
-| Acceso directo sin login | — | — | `/tablero` redirige al login |
+| Acceso directo sin login | — | — | `/tablero` redirige al login (`/`) |
 | 11 intentos fallidos | `admin` | mal | "Demasiados intentos…" (429) |
 
 Para crear más usuarios desde SQL:

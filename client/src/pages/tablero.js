@@ -1,4 +1,4 @@
-import { api, auth } from './api.js';
+import { api, auth } from '../api/api.js';
 
 /* =============================================================================
    Tablero de control · MarketCar
@@ -484,7 +484,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', pin
 
 // ---- Sesión -----------------------------------------------------------------
 function irAlLogin(motivo) {
-  window.location.replace(`/login.html${motivo ? `?motivo=${motivo}` : ''}`);
+  window.location.replace(`/${motivo ? `?motivo=${motivo}` : ''}`);
 }
 
 function pintarUsuario(u) {

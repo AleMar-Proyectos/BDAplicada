@@ -1,5 +1,5 @@
 import { AuthClient } from '@supabase/auth-js';
-import { config } from './config.js';
+import { config } from '../config.js';
 
 /**
  * Crea un cliente de Supabase Auth NUEVO para cada operación de autenticación.
@@ -24,4 +24,14 @@ export function clienteAuth() {
     autoRefreshToken: false,
     detectSessionInUrl: false,
   });
+}
+
+/** Revoca el refresh token del lado de Supabase. Nunca hace fallar el flujo. */
+export async function revocarSesion(accessToken) {
+  if (!accessToken) return;
+  try {
+    await clienteAuth().admin.signOut(accessToken, 'local');
+  } catch {
+    /* si falla, la sesión igual expira sola */
+  }
 }
