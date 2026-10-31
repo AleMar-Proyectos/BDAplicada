@@ -2,6 +2,28 @@
    Tablero (página protegida)
    ========================================================================== */
 
+:root {
+  --serie-1: #2a78d6;      /* color de las series (un solo color: una sola variable) */
+  --grilla: #e6e0d9;
+  --verde: #0ca30c;        /* semáforo: colores fijos, siempre con ícono y texto */
+  --amarillo: #fab219;
+  --rojo: #d03b3b;
+  --verde-texto: #1f7a4d;
+  --amarillo-texto: #8a5d00;
+  --rojo-texto: #b42318;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --serie-1: #3987e5;
+    --grilla: #33302d;
+    --verde-texto: #5cc795;
+    --amarillo-texto: #e5b84a;
+    --rojo-texto: #f2877c;
+  }
+}
+
+/* ---- Barra superior --------------------------------------------------------- */
 .barra {
   position: sticky;
   top: 0;
@@ -66,83 +88,19 @@
   font-size: 13px;
 }
 
+/* ---- Contenido -------------------------------------------------------------- */
 .contenido {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  max-width: 1120px;
+  gap: 20px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 32px clamp(16px, 4vw, 40px) 48px;
+  padding: 28px clamp(16px, 4vw, 40px) 40px;
+  transition: opacity 0.15s;
 }
 
-.saludo h1 {
-  font-size: 28px;
-  letter-spacing: -0.02em;
-}
-
-.saludo p {
-  color: var(--texto-2);
-}
-
-.verificaciones {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
-}
-
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 20px;
-  background: var(--superficie);
-  border: 1px solid var(--borde);
-  border-radius: var(--radio);
-  box-shadow: var(--sombra);
-}
-
-.panel__titulo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.panel__titulo h2 {
-  font-size: 16px;
-}
-
-.chip {
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--ok-suave);
-  color: var(--ok);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.chip--net {
-  background: color-mix(in srgb, #6d4ad6 14%, var(--superficie));
-  color: color-mix(in srgb, #6d4ad6 80%, var(--texto));
-}
-
-.datos {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 16px;
-  margin: 0;
-}
-
-.datos dt {
-  color: var(--texto-3);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.datos dd {
-  margin: 2px 0 0;
-  font-weight: 600;
-  overflow-wrap: anywhere;
+.contenido[aria-busy="true"] {
+  opacity: 0.6;
 }
 
 code {
@@ -150,48 +108,370 @@ code {
   font-size: 0.9em;
 }
 
-.estado {
+/* ---- Encabezado y navegación ------------------------------------------------ */
+.encabezado {
   display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+}
+
+.encabezado__nivel {
+  color: var(--marca);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.encabezado h1 {
+  font-size: clamp(22px, 3vw, 28px);
+  letter-spacing: -0.02em;
+}
+
+.navegacion {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px solid var(--borde);
+  gap: 12px;
+}
+
+.migas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
   font-size: 14px;
 }
 
-.estado--ok {
-  color: var(--ok);
-}
-
-.estado--error {
-  color: var(--error);
-}
-
-.estado--pendiente {
-  color: var(--texto-3);
-}
-
-.tablero-vacio {
-  padding: 28px;
-  border: 1.5px dashed var(--borde);
-  border-radius: var(--radio);
+.migas li {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   color: var(--texto-2);
 }
 
-.tablero-vacio h2 {
-  margin-bottom: 6px;
-  color: var(--texto);
-  font-size: 18px;
+.migas li + li::before {
+  content: "›";
+  color: var(--texto-3);
 }
+
+.migas a {
+  color: var(--texto-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--borde);
+}
+
+.migas a:hover {
+  color: var(--marca);
+}
+
+.migas [aria-current="page"] {
+  color: var(--texto);
+  font-weight: 600;
+}
+
+.boton--chico {
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.boton[aria-disabled="true"] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.aviso a {
+  color: inherit;
+  font-weight: 600;
+}
+
+/* ---- Indicadores ------------------------------------------------------------ */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+}
+
+.kpi__etiqueta {
+  color: var(--texto-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.kpi__valor {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.kpi__detalle {
+  color: var(--texto-3);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.delta {
+  font-weight: 700;
+}
+
+.kpi__detalle .semaforo {
+  white-space: normal;
+  align-items: flex-start;
+}
+
+.kpi__detalle .semaforo svg {
+  margin-top: 2px;
+}
+
+.delta--sube { color: var(--verde-texto); }
+.delta--baja { color: var(--rojo-texto); }
+.delta--igual { color: var(--texto-2); }
+
+/* ---- Paneles ---------------------------------------------------------------- */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+.panel__encabezado h2 {
+  font-size: 17px;
+}
+
+.panel__ayuda {
+  margin-top: 2px;
+  color: var(--texto-3);
+  font-size: 13px;
+}
+
+.grafico {
+  position: relative;
+  height: 240px;
+}
+
+.grafico[hidden] {
+  display: none;
+}
+
+.tendencias {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+/* ---- Tabla del nivel -------------------------------------------------------- */
+.tabla-caja {
+  overflow-x: auto;
+  margin: 0 -18px;
+  padding: 0 18px;
+}
+
+.tabla {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tabla th,
+.tabla td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--borde);
+}
+
+.tabla thead th {
+  color: var(--texto-3);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tabla tbody th {
+  font-weight: 600;
+}
+
+.tabla .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tabla tbody tr[data-destino] {
+  cursor: pointer;
+}
+
+.tabla tbody tr[data-destino]:hover {
+  background: var(--superficie-2);
+}
+
+.fila__enlace {
+  color: var(--texto);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--borde);
+}
+
+.fila__enlace:hover {
+  color: var(--marca);
+  text-decoration-color: currentColor;
+}
+
+.fila__enlace:focus-visible {
+  outline: none;
+  border-radius: 3px;
+  box-shadow: var(--foco);
+}
+
+.fila__sub {
+  display: block;
+  color: var(--texto-3);
+  font-size: 12.5px;
+  font-weight: 400;
+}
+
+.tabla__vacia {
+  padding: 24px;
+  color: var(--texto-2);
+  text-align: center;
+}
+
+.valor-semaforo {
+  display: inline-block;
+  min-width: 64px;
+  margin-right: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.estado-pub {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--superficie-2);
+  color: var(--texto-2);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.estado-pub--vendida {
+  background: color-mix(in srgb, var(--serie-1) 14%, var(--superficie));
+  color: var(--texto);
+}
+
+/* ---- Semáforo --------------------------------------------------------------- */
+.semaforo {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.semaforo svg { flex: none; }
+.semaforo--verde { color: var(--verde-texto); }
+.semaforo--verde svg { color: var(--verde); }
+.semaforo--amarillo { color: var(--amarillo-texto); }
+.semaforo--amarillo svg { color: var(--amarillo); }
+.semaforo--rojo { color: var(--rojo-texto); }
+.semaforo--rojo svg { color: var(--rojo); }
+.semaforo--nulo { color: var(--texto-3); }
+
+.referencia {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--superficie-2);
+  border-radius: var(--radio-sm);
+  font-size: 13px;
+}
+
+.referencia__titulo {
+  font-weight: 700;
+}
+
+.referencia ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.referencia li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--texto-2);
+}
+
+.referencia__fuente {
+  color: var(--texto-3);
+  font-size: 12px;
+}
+
+/* ---- Pie -------------------------------------------------------------------- */
+.pie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding-top: 8px;
+  color: var(--texto-3);
+  font-size: 12.5px;
+}
+
+.pie__estado::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--verde);
+  vertical-align: 1px;
+}
+
+.pie__estado--pendiente::before { background: var(--texto-3); }
+.pie__estado--error::before { background: var(--rojo); }
 
 @media (max-width: 640px) {
   .barra__marca small,
-  .barra__datos {
+  .barra__datos,
+  .boton__texto {
     display: none;
   }
 
-  .datos {
-    grid-template-columns: 1fr;
+  .kpi__valor {
+    font-size: 24px;
   }
 }

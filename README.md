@@ -140,6 +140,7 @@ BDAplicada_Proyecto/
 | * | `/api/net/*` | Node → .NET | sesión admin | Reenvía a `.NET /api/*` con el JWT |
 | GET | `/api/perfil` | .NET | JWT + política Administrador | Perfil leído con Npgsql |
 | GET | `/api/salud` | .NET | pública | Estado de la API y de la base |
+| GET | `/api/tablero?provincia=&ciudad=&vendedor=` | Node | sesión admin | Datos de un nivel del drill down: filas, indicadores, tendencias y umbrales del semáforo |
 
 Códigos de error que devuelve Node: `CREDENCIALES_INVALIDAS` (401), `SESION_INVALIDA` (401),
 `SIN_PERMISO` (403), `CUENTA_INACTIVA` (403), `DEMASIADOS_INTENTOS` (429), `DATOS_INVALIDOS` (400),
@@ -150,12 +151,21 @@ Códigos de error que devuelve Node: `CREDENCIALES_INVALIDAS` (401), `SESION_INV
 **Requisitos:** Node.js 20+ (recomendado 22 LTS), .NET SDK 8, un proyecto de Supabase.
 
 ### 6.1 Base de datos
-1. Supabase → **SQL Editor** → pegar y ejecutar `database/01_auth_usuarios.sql`.
-2. La última consulta debe mostrar los dos usuarios con `hash_bcrypt = $2a$10$…`.
+Supabase → **SQL Editor**, en este orden:
+
+| Script | Qué hace |
+|---|---|
+| `01_auth_usuarios.sql` | Usuarios, roles y contraseñas con bcrypt (la última consulta muestra `hash_bcrypt = $2a$10$…`) |
+| `02_unificar_vehiculos.sql` | Unifica autos, motos y rodados en `tipo_vehiculo`, `segmento`, `marca`, `modelo`, `version`, `vehiculo` y `foto_vehiculo` |
+| `03_borrar_tablas_viejas.sql` | Borra las 18 tablas viejas (frena si algo todavía las usa) |
+| `04_ajustes_finales.sql` | Borra `id_origen` y apunta las FK a `perfiles` |
+| `05_tablero_esquema.sql` | `provincia`, `ciudad`, `perfiles.ciudad_id`, `vehiculo.estado`, `venta`, `fn_semaforo` y la vista `vw_tablero_publicacion` |
+| `06_datos_ejemplo.sql` | Datos de ejemplo con `INSERT`: 4 provincias, 12 ciudades, 22 vendedores, ~170 publicaciones y sus ventas |
+| `07_consultas_tablero.sql` | Las consultas del tablero. **No se ejecuta a mano**: Node lee este archivo y corre cada bloque por su nombre |
 
 ### 6.2 Node.js
 ```bash
-cd api-node
+cd api-node                  # npm install trae también Chart.js, que Node sirve en /vendor/chartjs
 cp .env.example .env        # en Windows: copy .env.example .env
 # completar SUPABASE_URL, SUPABASE_ANON_KEY (Project Settings → API)
 # y DATABASE_URL (Connect → Session pooler)

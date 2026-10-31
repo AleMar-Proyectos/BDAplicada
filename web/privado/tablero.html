@@ -8,6 +8,8 @@
   <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/base.css">
   <link rel="stylesheet" href="/css/tablero.css">
+  <!-- Chart.js servido desde el mismo servidor (la CSP no permite scripts externos) -->
+  <script src="/vendor/chartjs/chart.umd.min.js" defer></script>
   <script type="module" src="/js/tablero.js"></script>
 </head>
 <body>
@@ -16,7 +18,6 @@
       <img src="/img/logo.svg" alt="" width="30" height="30">
       <span>MarketCar <small>Panel de control</small></span>
     </div>
-
     <div class="barra__usuario">
       <div class="avatar" id="avatar" aria-hidden="true">–</div>
       <div class="barra__datos">
@@ -25,57 +26,124 @@
       </div>
       <button id="btn-salir" type="button" class="boton boton--secundario">
         <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Cerrar sesión
+        <span class="boton__texto">Cerrar sesión</span>
       </button>
     </div>
   </header>
 
-  <main class="contenido">
-    <section class="saludo">
-      <h1 id="saludo">Bienvenido</h1>
-      <p>Sesión iniciada como administrador del marketplace.</p>
+  <main class="contenido" id="contenido" aria-busy="true">
+
+    <!-- Encabezado: dónde estoy y navegación entre niveles -->
+    <section class="encabezado">
+      <div class="encabezado__titulo">
+        <p class="encabezado__nivel" id="nivel-etiqueta">Nivel 1 de 4 · Provincias</p>
+        <h1 id="titulo">Marketplace en todo el país</h1>
+      </div>
+      <div class="navegacion">
+        <nav aria-label="Ubicación en el tablero">
+          <ol class="migas" id="migas"></ol>
+        </nav>
+        <a class="boton boton--secundario boton--chico" id="btn-anterior" href="#/" aria-disabled="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Nivel anterior
+        </a>
+      </div>
     </section>
 
-    <section class="verificaciones" aria-label="Verificación de la sesión">
-      <article class="panel">
-        <header class="panel__titulo">
-          <span class="chip">Node.js</span>
-          <h2>Sesión · Supabase Auth</h2>
-        </header>
-        <dl class="datos">
-          <div><dt>Usuario</dt><dd id="d-usuario">—</dd></div>
-          <div><dt>Rol</dt><dd id="d-rol">—</dd></div>
-          <div><dt>Tipo de cuenta</dt><dd id="d-tipo">—</dd></div>
-          <div><dt>Último acceso</dt><dd id="d-acceso">—</dd></div>
-        </dl>
-        <p class="estado estado--ok">
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Token verificado y perfil leído de <code>public.perfiles</code>
-        </p>
+    <div class="aviso aviso--error" id="aviso" role="alert" hidden></div>
+
+    <!-- Indicadores de cabecera -->
+    <section class="kpis" aria-label="Indicadores">
+      <article class="kpi">
+        <h2 class="kpi__etiqueta">Publicaciones activas</h2>
+        <p class="kpi__valor" id="k-activas">—</p>
+        <p class="kpi__detalle" id="k-activas-det">&nbsp;</p>
       </article>
-
-      <article class="panel">
-        <header class="panel__titulo">
-          <span class="chip chip--net">.NET</span>
-          <h2>API · validación del JWT</h2>
-        </header>
-        <dl class="datos">
-          <div><dt>Endpoint</dt><dd><code>GET /api/perfil</code></dd></div>
-          <div><dt>Política</dt><dd>Administrador</dd></div>
-          <div><dt>Token expira</dt><dd id="d-expira">—</dd></div>
-          <div><dt>Alta de la cuenta</dt><dd id="d-alta">—</dd></div>
-        </dl>
-        <p id="estado-net" class="estado estado--pendiente">Consultando la API .NET…</p>
+      <article class="kpi">
+        <h2 class="kpi__etiqueta">Ventas · últimos 30 días</h2>
+        <p class="kpi__valor" id="k-ventas">—</p>
+        <p class="kpi__detalle" id="k-ventas-det">&nbsp;</p>
+      </article>
+      <article class="kpi">
+        <h2 class="kpi__etiqueta">Monto vendido · 30 días</h2>
+        <p class="kpi__valor" id="k-monto">—</p>
+        <p class="kpi__detalle" id="k-monto-det">&nbsp;</p>
+      </article>
+      <article class="kpi">
+        <h2 class="kpi__etiqueta">Conversión</h2>
+        <p class="kpi__valor" id="k-conversion">—</p>
+        <p class="kpi__detalle" id="k-conversion-det">&nbsp;</p>
+      </article>
+      <article class="kpi">
+        <h2 class="kpi__etiqueta">Días promedio hasta la venta</h2>
+        <p class="kpi__valor" id="k-dias">—</p>
+        <p class="kpi__detalle" id="k-dias-det">&nbsp;</p>
+      </article>
+      <article class="kpi">
+        <h2 class="kpi__etiqueta">Publicaciones estancadas</h2>
+        <p class="kpi__valor" id="k-estancadas">—</p>
+        <p class="kpi__detalle" id="k-estancadas-det">&nbsp;</p>
       </article>
     </section>
 
-    <section class="tablero-vacio" aria-labelledby="titulo-tablero">
-      <h2 id="titulo-tablero">Indicadores del marketplace</h2>
-      <p>
-        Acá se monta el tablero: indicadores de cabecera, drill down
-        Provincia → Ciudad → Vendedor → Publicación y semaforización.
-      </p>
+    <!-- Nivel actual del drill down -->
+    <section class="panel panel--nivel" aria-labelledby="nivel-titulo">
+      <header class="panel__encabezado">
+        <div>
+          <h2 id="nivel-titulo">Conversión por provincia</h2>
+          <p class="panel__ayuda" id="nivel-ayuda">Hacé clic en una barra o en una fila para ver el detalle.</p>
+        </div>
+      </header>
+
+      <div class="grafico grafico--nivel" id="grafico-nivel-caja">
+        <canvas id="grafico-nivel" role="img" aria-label="Gráfico de conversión del nivel actual"></canvas>
+      </div>
+
+      <div class="tabla-caja">
+        <table class="tabla" id="tabla-nivel">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="referencia" id="referencia" aria-label="Referencia del semáforo"></div>
     </section>
+
+    <!-- Tendencias -->
+    <section class="tendencias" aria-label="Tendencias">
+      <article class="panel">
+        <header class="panel__encabezado">
+          <div>
+            <h2>Ventas por mes</h2>
+            <p class="panel__ayuda">Unidades vendidas en los últimos 12 meses</p>
+          </div>
+        </header>
+        <div class="grafico"><canvas id="grafico-meses" role="img" aria-label="Ventas por mes"></canvas></div>
+      </article>
+      <article class="panel">
+        <header class="panel__encabezado">
+          <div>
+            <h2>Ventas por tipo de vehículo</h2>
+            <p class="panel__ayuda">Unidades vendidas desde el inicio</p>
+          </div>
+        </header>
+        <div class="grafico"><canvas id="grafico-tipos" role="img" aria-label="Ventas por tipo de vehículo"></canvas></div>
+      </article>
+      <article class="panel">
+        <header class="panel__encabezado">
+          <div>
+            <h2>Antigüedad de las publicaciones activas</h2>
+            <p class="panel__ayuda">Cuántas están al día, demoradas o estancadas</p>
+          </div>
+        </header>
+        <div class="grafico"><canvas id="grafico-antiguedad" role="img" aria-label="Publicaciones activas según antigüedad"></canvas></div>
+      </article>
+    </section>
+
+    <footer class="pie">
+      <span class="pie__estado" id="estado-node">Sesión verificada por Node · Supabase Auth</span>
+      <span class="pie__estado pie__estado--pendiente" id="estado-net">API .NET: verificando…</span>
+    </footer>
   </main>
 </body>
 </html>
