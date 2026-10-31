@@ -1,9 +1,13 @@
 import { query } from '../db.js';
+import { Errores } from './errores.js';
 
 /**
- * Acceso a datos de public.perfiles (perfil de negocio).
+ * Acceso a public.perfiles (perfil de negocio de cada usuario).
  * Las credenciales NO están acá: las valida Supabase Auth contra auth.users.
+ * Lo usan el controlador de auth (login) y el middleware validateToken.
  */
+
+const ROL_PANEL = 'admin';
 
 const COLUMNAS = `
   id_usuario,
@@ -39,4 +43,23 @@ export async function buscarPorId(idUsuario) {
 
 export async function registrarAcceso(idUsuario) {
   await query('UPDATE public.perfiles SET ultimo_acceso = now() WHERE id_usuario = $1', [idUsuario]);
+}
+
+/** Solo entran al panel las cuentas activas con rol admin. */
+export function validarAccesoAlPanel(perfil) {
+  if (!perfil.activo) throw Errores.cuentaInactiva();
+  if (perfil.rol !== ROL_PANEL) throw Errores.sinPermiso();
+}
+
+/** Datos del perfil que se pueden mostrar en el front. */
+export function perfilPublico(perfil) {
+  return {
+    id: perfil.id_usuario,
+    usuario: perfil.nombre_usuario,
+    correo: perfil.correo,
+    nombre: perfil.nombre_completo,
+    tipo: perfil.tipo_usuario,
+    rol: perfil.rol,
+    ultimoAcceso: perfil.ultimo_acceso,
+  };
 }

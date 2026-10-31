@@ -1,4 +1,4 @@
-import { auth, ErrorApi } from './api.js';
+import { auth, ErrorApi } from '../api/api.js';
 
 const $ = (id) => document.getElementById(id);
 

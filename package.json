@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "MarketCar · Panel de control — gateway de autenticación (Supabase Auth) y servidor del front",
   "type": "module",
-  "main": "src/server.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
   },
   "engines": {
     "node": ">=20"

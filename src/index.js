@@ -1,8 +1,6 @@
 import { config } from './config.js';
-import { crearApp } from './app.js';
+import app from './app.js';
 import { pool } from './db.js';
-
-const app = crearApp();
 
 const servidor = app.listen(config.puerto, async () => {
   console.log(`🚗 MarketCar · Panel de control → http://localhost:${config.puerto}`);

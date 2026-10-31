@@ -1,7 +1,5 @@
-import { Router } from 'express';
 import { config } from '../config.js';
-import { requiereSesion } from '../middlewares/autenticacion.js';
-import { ErrorApp } from '../errores.js';
+import { ErrorApp } from '../libs/errores.js';
 
 /**
  * Puente hacia la API .NET (patrón Backend-for-Frontend).
@@ -9,11 +7,9 @@ import { ErrorApp } from '../errores.js';
  * como "Authorization: Bearer" y reenvía a .NET. Así el token nunca queda
  * expuesto al JavaScript del navegador y .NET no necesita CORS.
  */
-export const netRutas = Router();
-
 const METODOS_CON_BODY = new Set(['POST', 'PUT', 'PATCH']);
 
-netRutas.use(requiereSesion('api'), async (req, res, next) => {
+export const reenviarANet = async (req, res, next) => {
   const destino = `${config.dotnetApiUrl}/api${req.url}`;
 
   try {
@@ -37,4 +33,4 @@ netRutas.use(requiereSesion('api'), async (req, res, next) => {
     console.error(`[net] No se pudo contactar a la API .NET (${destino}):`, err.message);
     next(new ErrorApp(502, 'API_NET_NO_DISPONIBLE', 'La API .NET no está disponible.'));
   }
-});
+};
